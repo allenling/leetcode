@@ -17,7 +17,7 @@ v2: get_directions使用if而不是列表的形式计算四个方向
 '''
 from collections import deque
 
-@profile
+
 def get_directions(cor, max_row_index, max_col_index):
     sub_row, sub_cell = cor
     directions = []
@@ -46,7 +46,7 @@ def get_first_two_path(cor, board, max_row_index, max_col_index, word):
             walk_deq.appendleft([cor, next_d])
     return walk_deq, first_point
 
-@profile
+
 def divide_walk_board(board, word):
     word_len = len(word)
     board_len = len(board)
