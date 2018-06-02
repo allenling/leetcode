@@ -1,57 +1,68 @@
 '''
 https://leetcode.com/problems/longest-substring-without-repeating-characters/description/
 
-想法是O(n)
+动态规划, 遍历一次, 使用中间变量保存结果, O(n)
 
 第一次才领先14%~~~尴尬
 
-应该是在遇到重复的时候不应该回位置那么多的, 比如dvadfw:
-
-遇到第二个d的时候, 直接从v开始, 可以直接从d开始, 字典初始化为{v, d}
-
-操作就是把dict中的d的位置更新一下, 然后current_start从重复的d后面一位开始, 然后更新current_len = i - current_start + 1
-
-然后继续遍历就好了, 这样就是O(n)了, 不需要重新从重复字符的后面以为开始遍历, 必须上面的例子, 不需要从dvad的第一个d后面的v开始遍历
-
-更新d的位置为3后, 更新current_start = 1, current_len = 3 - 1 + 1 = 3, 然后继续从第二个d开始遍历就好了
-
-并且如果发现重复的, 但是位置小于current_start的, 可以直接更新就好
-
 第二次是领先36%, 差不多感觉
 
+2018-06-02再修改, 想了一个流程, 然后自己也看不懂了, 然后过了leetcode, 领先83.55%, 耗时88ms
+
+最快68ms, 我这里中间变量用得多, 耗时多一点点, 思路差不多
 '''
 
 
-def lswr(s):
-    if not s:
-        return ''
-    len_s = len(s)
-    if len_s == 1:
-        return s
-    current_start = max_start = 0
-    i = current_len = max_len = 0
-    sub_dict = {}
-    while i < len_s:
-        current = s[i]
-        if current not in sub_dict or sub_dict[current] < current_start:
-            current_len += 1
-            sub_dict[current] = i
+def lswr(word):
+    '''
+    判断2部分, 也就是调整下面两部分的下标:
+    abcde bfgh
+    1. abcde
+    2. cdebfgh
+
+    下面的流程, 虽然是我自己想出来的, 但是我自己都看不懂了
+    '''
+    word_len = len(word)
+    if not word:
+        return 0
+    if word_len == 1:
+        return 1
+    if word_len == 2:
+        return 1 if word[0] == word[1] else 2
+    max_dict = {}
+    max_start = max_end = 0
+    split_index = None
+    for index, w in enumerate(word):
+        w = word[index]
+        old_index = max_dict.get(w, None)
+        max_dict[w] = index
+        if split_index is not None:
+            if old_index is None or old_index < split_index:
+                continue
+            else:
+                last_len = index - split_index
+                if last_len >= (max_end - max_start + 1):
+                    max_start, max_end = split_index, index - 1
+                    split_index = old_index + 1
+                else:
+                    split_index = old_index + 1
         else:
-            if current_len > max_len:
-                max_start = current_start
-                max_len = current_len
-            current_start = sub_dict[current] + 1
-            current_len = i - current_start + 1
-            sub_dict[current] = i
-        i += 1
-    if current_len > max_len:
-        max_start = current_start
-        max_len = current_len
-    return s[max_start: max_start + max_len]
+            if old_index is None:
+                max_end = index
+            else:
+                split_index = old_index + 1
+    # finally
+    max_len = (max_end - max_start + 1)
+    if split_index is not None:
+        max_len = max(max_len, word_len - split_index)
+    return max_len
 
 
 def main():
-    ss = ['abba', 'dvdf', 'au', 'pwwkew', 'abcabcbb', 'bbbbb']
+    ss = ['bpoiexpqhmebhhu', 'pwwkew', 'abba', 'dvdf', 'au', 'abcabcbb', 'bbbbb']
+    for s in ss:
+        print(s, lswr(s))
+    print('-----------------')
     for s in ss:
         print(s, lswr(s))
     return

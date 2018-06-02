@@ -100,35 +100,79 @@ def divide_walk_board(board, word):
     return False
 
 
+from collections import Counter
+
+
+class Solution:
+    '''
+    leetcode上python3最快124ms
+    '''
+
+    def exist(self, board, word):
+        """
+        :type board: List[List[str]]
+        :type word: str
+        :rtype: bool
+        """
+        num_rows = len(board)
+        num_cols = len(board[0])
+        c_board = Counter([elem for row in board for elem in row])
+        c_word = Counter(word)
+        for char in c_word:
+            if char not in c_board or c_board[char] < c_word[char]:
+                return False
+        visited = [[False] * num_cols for _ in range(num_rows)]
+        for row in range(num_rows):
+            for col in range(num_cols):
+                if self.dfs(board, word, row, col, 0, visited):
+                    return True
+        return False
+
+    def dfs(self, board, word, row, col, idx, visited):
+        if idx == len(word):
+            return True
+        elif row < 0 or row >= len(board) or col < 0 or col >= len(board[0]) or \
+                visited[row][col] or board[row][col] != word[idx]:
+            return False
+        else:
+            visited[row][col] = True
+            ret = (self.dfs(board, word, row + 1, col, idx + 1, visited) or
+                   self.dfs(board, word, row - 1, col, idx + 1, visited) or
+                   self.dfs(board, word, row, col + 1, idx + 1, visited) or
+                   self.dfs(board, word, row, col - 1, idx + 1, visited))
+            visited[row][col] = False
+            return ret
+
+
 def main():
     max_board = [['a'] * 30 for _ in range(29)]
     max_board.append(['a'] * 29 + ['b'])
     max_word = 'b' + 'a' * 899
     res = divide_walk_board(max_board, max_word)
     print('max_board', res)
-#     boards = [[["A", "B", "C", "E"],
-#                ["S", "F", "E", "S"],
-#                ["A", "D", "E", "E"],
-#                ],
-#               [['a', 'a', 'c'],
-#                ['e', 'd', 'q'],
-#                ],
-#               [['A', 'B', 'E', 'E'],
-#                ['S', 'F', 'C', 'S'],
-#                ['A', 'D', 'C', 'E'],
-#                ],
-#               [['a', 'a'],
-#                ],
-#               [['A', 'B', 'C', 'E'],
-#                ['S', 'F', 'C', 'S'],
-#                ['A', 'D', 'E', 'E'],
-#                ],
-#               ]
-#     words = [['ABCESEEEFS'], ['aada'], ['SEE', 'ABCCED', 'ABCB'], ['aa'], ['ABCCED', 'ABCCEDFB']]
-#     for board, word_list in zip(boards, words):
-#         for word in word_list:
-#             res = divide_walk_board(board, word)
-#             print(word, res)
+    boards = [[["A", "B", "C", "E"],
+               ["S", "F", "E", "S"],
+               ["A", "D", "E", "E"],
+               ],
+              [['a', 'a', 'c'],
+               ['e', 'd', 'q'],
+               ],
+              [['A', 'B', 'E', 'E'],
+               ['S', 'F', 'C', 'S'],
+               ['A', 'D', 'C', 'E'],
+               ],
+              [['a', 'a'],
+               ],
+              [['A', 'B', 'C', 'E'],
+               ['S', 'F', 'C', 'S'],
+               ['A', 'D', 'E', 'E'],
+               ],
+              ]
+    words = [['ABCESEEEFS'], ['aada'], ['SEE', 'ABCCED', 'ABCB'], ['aa'], ['ABCCED', 'ABCCEDFB']]
+    for board, word_list in zip(boards, words):
+        for word in word_list:
+            res = divide_walk_board(board, word)
+            print(word, res)
     return
 
 
