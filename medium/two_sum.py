@@ -1,61 +1,58 @@
+'''
+56ms, 超过56.46%
+'''
 
 
-def two_sum(n, target):
-    if not n or len(n) == 1:
+def new_two_sum(data, target):
+    if not data:
         return []
-    len_n = len(n)
-    m = {}
     res = []
-    index = 0
-    while index < len_n:
-        i = n[index]
-        if i not in m:
-            m[i] = {'count': 1, 'paths': [index]}
+    data_info = {}
+    for index, value in enumerate(data):
+        if value not in data_info:
+            data_info[value] = {'count': 1, 'indexes': set([index])}
         else:
-            m[i]['count'] += 1
-            m[i]['paths'].append(index)
-        index += 1
-    index = 0
-    while index < len_n:
-        i = n[index]
-        if m[i]['count'] <= 0:
-            index += 1
+            data_info[value]['count'] += 1
+            data_info[value]['indexes'].add(index)
+    for index, value in enumerate(data):
+        current_info = data_info[value]
+        if current_info['count'] == 0:
+            current_info = None
             continue
-        t = target - i
-        if t in m:
-            if m[t]['count'] <= 0:
-                index += 1
-                continue
-            if t == i:
-                if len(m[t]['paths']) == 1:
-                    index += 1
-                    continue
-                path = m[t]['paths'].pop(m[t]['paths'].index(index) + 1)
-            else:
-                path = m[t]['paths'].pop(0)
-            res.append(sorted([index, path]))
-            if m[i]['count'] > 0:
-                m[i]['count'] -= 1
-                m[i]['paths'].remove(index)
-            if m[t]['count'] > 0:
-                m[t]['count'] -= 1
-        index += 1
-    return res
+        left = target - value
+        left_info = data_info.get(left, None)
+        if left_info is None:
+            continue
+        if left_info['count'] == 0:
+            left_info = None
+            continue
+        current_info['indexes'].remove(index)
+        current_info['count'] -= 1
+        if left_info['count'] == 0:
+            left_info = None
+            continue
+        left_info['count'] -= 1
+        next_index = left_info['indexes'].pop()
+        res.append([index, next_index])
+    return res[0] if res else []
 
 
 def main():
-    target = 9
-    print('---------9--------------')
-    ts = [[4.5, 4.5], [4.5, 7, 2], [2, 7, 11, 15], [3, 6, 3],
-          [2, 6, 7, 2, 3, 8], [], [2],
-          ]
-    for t in ts:
-        print(t, two_sum(t, target))
     print('---------6--------------')
     ta1 = 6
     tts = [[3, 2, 4]]
     for t in tts:
-        print(t, two_sum(t, ta1))
+        print(t, new_two_sum(t, ta1))
+        print('~~~~~~~~~~~~~~~')
+    target = 9
+    print('---------9--------------')
+    ts = [[2, 7, 11, 15],
+          [4.5, 4.5], [4.5, 7, 2], [2, 7, 11, 15], [3, 6, 3],
+          [2, 6, 7, 2, 3, 8], [], [2],
+          ]
+    for t in ts:
+        print(t, new_two_sum(t, target))
+        print('~~~~~~~~~~~~~~~')
     return
 
 
